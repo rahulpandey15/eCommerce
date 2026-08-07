@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/BE/" />
+  <Folder Name="/src/BE/Application/">
+    <Project Path="eCommerce.Application/eCommerce.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/BE/Domain/">
+    <Project Path="eCommerce.Domain/eCommerce.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/BE/Infrastructure/">
+    <Project Path="eCommerce.Infrastructure/eCommerce.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/BE/Presentation/">
+    <Project Path="eCommerce.API/eCommerce.API.csproj" />
+  </Folder>
+  <Folder Name="/src/UI/">
+    <Project Path="eCommerce.UI/eCommerce.UI.csproj" />
+  </Folder>
+  <Folder Name="/test/" />
+</Solution>
