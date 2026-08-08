@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using eCommerce.Infrastructure.Configuration;
 
 namespace eCommerce.Infrastructure.Entities
 {
@@ -13,9 +14,9 @@ namespace eCommerce.Infrastructure.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            // Apply common auditable entity configuration to all entities that inherit AuditableEntity
+            modelBuilder.ApplyAuditableEntityConfiguration();
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-
             base.OnModelCreating(modelBuilder);
         }
 

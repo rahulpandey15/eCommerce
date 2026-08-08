@@ -3,10 +3,12 @@
     public static class ServiceRegistration
     {
 
+        public static IServiceCollection AddPresentationDependencies(
+            this IServiceCollection services)
+        {
+
+            return services;
+        }
+
     }
 }
-
-
-
-
-// extension Methods

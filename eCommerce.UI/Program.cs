@@ -21,7 +21,6 @@ namespace eCommerce.UI
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.MapStaticAssets();

@@ -12,6 +12,10 @@ namespace eCommerce.Infrastructure.Configuration
             builder.Property(x => x.RoleName)
                 .IsRequired()
                 .HasMaxLength(100);
+
+            builder.Property(x => x.IsActive)
+              .IsRequired()
+              .HasDefaultValue(true);
         }
     }
 }

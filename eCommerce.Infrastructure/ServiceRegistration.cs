@@ -21,8 +21,6 @@ namespace eCommerce.Infrastructure
             {
                 options.UseSqlServer(connectionString);
             });
-
-
             return services;
         }
 
