@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using eCommerce.Infrastructure.Entities;
+using eCommerce.Infrastructure.Persistence.Entities;
 
-namespace eCommerce.Infrastructure.Configuration
+namespace eCommerce.Infrastructure.Persistence.Configuration
 {
     // Applies common configuration for all entities deriving from AuditableEntity
     public static class AuditableEntityConfiguration

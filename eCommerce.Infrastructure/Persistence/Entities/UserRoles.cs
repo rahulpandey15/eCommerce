@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eCommerce.Infrastructure.Entities
+﻿namespace eCommerce.Infrastructure.Persistence.Entities
 {
     public class UserRoles : AuditableEntity
     {

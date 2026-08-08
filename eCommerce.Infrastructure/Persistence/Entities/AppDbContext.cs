@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using eCommerce.Infrastructure.Configuration;
+using eCommerce.Infrastructure.Persistence.Configuration;
 
-namespace eCommerce.Infrastructure.Entities
+namespace eCommerce.Infrastructure.Persistence.Entities
 {
     public class AppDbContext : DbContext
     {

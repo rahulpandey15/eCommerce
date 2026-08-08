@@ -1,4 +1,4 @@
-﻿namespace eCommerce.Infrastructure.Entities
+﻿namespace eCommerce.Infrastructure.Persistence.Entities
 {
     public class Role : AuditableEntity
     {

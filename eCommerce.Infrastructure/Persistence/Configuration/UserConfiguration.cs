@@ -1,8 +1,8 @@
-﻿using eCommerce.Infrastructure.Entities;
+﻿using eCommerce.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace eCommerce.Infrastructure.Configuration
+namespace eCommerce.Infrastructure.Persistence.Configuration
 {
     public class UserConfiguration : IEntityTypeConfiguration<User>
     {
