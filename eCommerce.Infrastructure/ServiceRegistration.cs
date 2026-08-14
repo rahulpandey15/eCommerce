@@ -21,9 +21,8 @@ namespace eCommerce.Infrastructure
                 options.UseSqlServer(connectionString);
             });
 
-
-
-            services.AddScoped<IUserRepository, UserRepository>();  // DI register
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITokenRepository, TokenRepository>();  
 
             return services;
         }

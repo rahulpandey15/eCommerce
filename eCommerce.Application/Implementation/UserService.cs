@@ -14,7 +14,7 @@ namespace eCommerce.Application.Implementation
             IPasswordHasher passwordHasher)
         {
             _userRepository = userRepository;
-            this._passwordHasher = passwordHasher;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<bool> RegisterUserAsync(CreateUserDto createUser)

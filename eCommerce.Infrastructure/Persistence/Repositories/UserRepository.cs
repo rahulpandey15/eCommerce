@@ -16,6 +16,24 @@ namespace eCommerce.Infrastructure.Persistence.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<UserDomain> GetUserByEmailAsync(
+            string emailAddress)
+        {
+            var user =  await _dbContext.Users.FirstOrDefaultAsync(
+                        x => x.Email == emailAddress);
+
+            if(user is not null)
+                return new UserDomain()
+                {
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Password = user.Password,
+                };
+
+            return new UserDomain();
+        }
+
         public async Task<bool> IsDuplicateUserAsync(
             string emailAddress)
         {

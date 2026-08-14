@@ -1,8 +1,4 @@
-﻿using BCrypt.Net;
-using eCommerce.Application.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using eCommerce.Application.Contracts;
 
 namespace eCommerce.Application.Implementation
 {
