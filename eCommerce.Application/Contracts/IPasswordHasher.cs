@@ -8,5 +8,7 @@ namespace eCommerce.Application.Contracts
     {
         string Hash(string password);
 
+        bool Verify(string plainTextPassword, string hashedPassword);
+
     }
 }

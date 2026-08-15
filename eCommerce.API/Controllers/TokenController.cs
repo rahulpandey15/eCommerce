@@ -21,7 +21,9 @@ namespace eCommerce.API.Controllers
         public async Task<IActionResult> Post(
             ValidateUserDto validateUserDto)
         {
-            return Ok();
+            var tokenDetails
+                 = await tokenService.GetTokenAsync(validateUserDto);
+            return Ok(tokenDetails);
         }
 
     }

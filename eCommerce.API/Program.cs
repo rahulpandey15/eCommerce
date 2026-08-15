@@ -1,5 +1,8 @@
 using eCommerce.Infrastructure;
 using eCommerce.Application;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 namespace eCommerce.API
@@ -13,6 +16,22 @@ namespace eCommerce.API
             // Add services to the container.
 
             builder.Services.AddControllers();
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!)),
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        ValidateAudience = true,
+                        ValidateIssuer = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+
 
             builder.Services.AddApplication();
             builder.Services.AddInfrastructure(
@@ -34,6 +53,7 @@ namespace eCommerce.API
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
 
