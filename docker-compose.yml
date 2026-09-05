@@ -1,0 +1,43 @@
+services:
+  ecommerce-api:
+    container_name: ecommerce-api
+    build:
+      context: .
+      dockerfile: eCommerce.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://+:${API_INTERNAL_PORT:-8080}
+      ConnectionStrings__DatabaseConnection: ${API_CONNECTION_STRING:-}
+      Jwt__Secret: ${JWT_SECRET:-}
+      Jwt__Issuer: ${JWT_ISSUER:-eCommerceAPI}
+      Jwt__Audience: ${JWT_AUDIENCE:-eCommerceUI}
+    ports:
+      - "${API_HOST_PORT:-5285}:${API_INTERNAL_PORT:-8080}"
+    restart: unless-stopped
+    networks:
+      - ecommerce-net
+
+  ecommerce-ui:
+    container_name: ecommerce-ui
+    build:
+      context: .
+      dockerfile: eCommerce.UI/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://+:${UI_INTERNAL_PORT:-8080}
+      Api__BaseUrl: ${UI_API_BASE_URL:-http://ecommerce-api:${API_INTERNAL_PORT:-8080}}
+    ports:
+      - "${UI_HOST_PORT:-5204}:${UI_INTERNAL_PORT:-8080}"
+    depends_on:
+      ecommerce-api:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - ecommerce-net
+
+networks:
+  ecommerce-net:
+    name: ecommerce-net
+    driver: bridge
+
+

@@ -15,4 +15,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EmailService\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\eCommerce.Domain\eCommerce.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

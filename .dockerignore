@@ -1,0 +1,25 @@
+# Build output
+**/bin/
+**/obj/
+
+# IDE/editor
+**/.vs/
+**/.vscode/
+**/.idea/
+*.user
+*.suo
+
+# VCS
+.git/
+.gitignore
+
+# OS clutter
+.DS_Store
+
+# Local environment overrides
+.env
+.env.*
+
+# Docker artifacts
+docker-compose.override.yml
+
