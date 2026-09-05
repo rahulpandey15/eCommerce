@@ -10,10 +10,10 @@ RUN dotnet restore "eCommerce.UI/eCommerce.UI.csproj"
 FROM restore AS build
 COPY . .
 WORKDIR /src/eCommerce.UI
-RUN dotnet build "eCommerce.UI.csproj" -c Release -o /app/build --no-restore
+RUN dotnet build "eCommerce.UI.csproj" -c Release --no-restore
 
 FROM build AS publish
-RUN dotnet publish "eCommerce.UI.csproj" -c Release -o /app/publish --no-build /p:UseAppHost=false
+RUN dotnet publish "eCommerce.UI.csproj" -c Release -o /app/publish --no-build --no-restore /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app

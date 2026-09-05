@@ -14,10 +14,10 @@ RUN dotnet restore "eCommerce.API/eCommerce.API.csproj"
 FROM restore AS build
 COPY . .
 WORKDIR /src/eCommerce.API
-RUN dotnet build "eCommerce.API.csproj" -c Release -o /app/build --no-restore
+RUN dotnet build "eCommerce.API.csproj" -c Release --no-restore
 
 FROM build AS publish
-RUN dotnet publish "eCommerce.API.csproj" -c Release -o /app/publish --no-build /p:UseAppHost=false
+RUN dotnet publish "eCommerce.API.csproj" -c Release -o /app/publish --no-build --no-restore /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
