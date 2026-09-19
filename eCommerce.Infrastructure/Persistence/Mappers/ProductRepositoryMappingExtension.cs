@@ -1,8 +1,5 @@
 using eCommerce.Domain.DomainObjects;
 using eCommerce.Infrastructure.Persistence.Entities;
-using System.Collections.Generic;
-using System.Linq;
-using System;
 
 namespace eCommerce.Infrastructure.Persistence.Mappers
 {

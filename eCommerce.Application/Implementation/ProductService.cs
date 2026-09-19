@@ -3,8 +3,6 @@ using eCommerce.Application.DTO.Request;
 using eCommerce.Application.DTO.Response;
 using eCommerce.Application.Mappers;
 using eCommerce.Domain.Contracts;
-using eCommerce.Domain.DomainObjects;
-using System.Collections.Generic;
 
 namespace eCommerce.Application.Implementation
 {

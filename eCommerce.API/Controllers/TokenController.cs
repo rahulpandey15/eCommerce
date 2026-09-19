@@ -1,6 +1,5 @@
 ﻿using eCommerce.Application.Contracts;
 using eCommerce.Application.DTO.Request;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eCommerce.API.Controllers
@@ -23,6 +22,17 @@ namespace eCommerce.API.Controllers
         {
             var tokenDetails
                  = await tokenService.GetTokenAsync(validateUserDto);
+            return Ok(tokenDetails);
+        }
+
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken(
+            RefreshTokenDto refreshTokenDto)
+        {
+            var tokenDetails
+                 = await tokenService.RefreshTokenAsync(refreshTokenDto);
+
             return Ok(tokenDetails);
         }
 

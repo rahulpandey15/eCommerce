@@ -1,6 +1,5 @@
 using eCommerce.Application.Contracts;
 using eCommerce.Application.DTO.Request;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eCommerce.API.Controllers
@@ -46,9 +45,13 @@ namespace eCommerce.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var result = await productService.DeleteProductAsync(id);
+
             if (!result.Exists) return NotFound();
+            
             if (result.HasOrders) return Conflict(new { message = "Product is referenced by orders and cannot be deleted." });
+            
             if (result.Success) return NoContent();
+            
             return BadRequest();
         }
     }

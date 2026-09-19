@@ -3,9 +3,7 @@ using eCommerce.Infrastructure.Persistence.Entities;
 using eCommerce.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace eCommerce.Infrastructure
 {
@@ -25,7 +23,7 @@ namespace eCommerce.Infrastructure
             services.AddScoped<ITokenRepository, TokenRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
-
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             return services;
         }
