@@ -17,7 +17,7 @@ namespace eCommerce.Infrastructure.Persistence.Repositories
         }
 
 
-        public async Task<bool> AddCategoryAsync(CategoryDomain request)
+        public async Task<int> AddCategoryAsync(CategoryDomain request)
         {
             //Domain-- Entities
             var category
@@ -27,9 +27,10 @@ namespace eCommerce.Infrastructure.Persistence.Repositories
             category.CreatedOn = DateTime.Now;
 
             _dbContext.Categories.Add(category);
-            int rowsInserted = await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
 
-            return rowsInserted > 0;
+            // EF populates the Id after SaveChanges
+            return category.Id;
         }
 
         public async Task<IEnumerable<CategoryDomain>> GetCategoriesAsync()
@@ -49,6 +50,22 @@ namespace eCommerce.Infrastructure.Persistence.Repositories
 
             //Domain-- Entities
             return categories.ToCategoryDomain();
+        }
+
+        public async Task<bool> HasProductsAsync(int categoryId)
+        {
+            return await _dbContext.Products.AnyAsync(p => p.CategoryId == categoryId);
+        }
+
+        public async Task<bool> DeleteCategoryAsync(int categoryId)
+        {
+            var category = await _dbContext.Categories.FindAsync(categoryId);
+            if (category is null)
+                return false;
+
+            _dbContext.Categories.Remove(category);
+            var rows = await _dbContext.SaveChangesAsync();
+            return rows > 0;
         }
     }
 }

@@ -27,6 +27,7 @@ namespace eCommerce.Infrastructure.Persistence.Mappers
         {
             return new CategoryDomain()
             {
+                Id = domain.Id,
                 Name = domain.Name,
                 Description = domain.Description,
             };

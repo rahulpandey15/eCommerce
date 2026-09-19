@@ -1,39 +1,51 @@
 ﻿using eCommerce.Application.Contracts;
 using eCommerce.Application.DTO.Request;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eCommerce.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // TODO : OnlY admin can create category
-    public class CategoryController : ControllerBase
+    public class CategoryController(ICategoryService categoryService) : ControllerBase
     {
-        private readonly ICategoryService categoryService;
-
-        public CategoryController(ICategoryService categoryService)
-        {
-            this.categoryService = categoryService;
-        }
-
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return Ok();
+            var categories = await categoryService.GetCategoriesAsync();
+            return Ok(categories);
+        }
 
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var category = await categoryService.GetCategoryByIdAsync(id);
+            
+            return Ok(category);
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(CreateCategoryDto request)
         {
-            var response
-                  = await categoryService.AddCategoryAsync(request);
+            var createdId = await categoryService.AddCategoryAsync(request);
+            
+            return CreatedAtAction(nameof(GetById), new { id = createdId }, null);
+        }
 
-            if (response)
-                return Created("Category Added", response);
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await categoryService.DeleteCategoryAsync(id);
 
-            return BadRequest(response);
+            if (!result.Exists)
+                return NotFound();
+
+            if (result.HasProducts)
+                return Conflict(new { message = "Category has products and cannot be deleted." });
+
+            if (result.Success)
+                return NoContent();
+
+            return BadRequest();
         }
 
 

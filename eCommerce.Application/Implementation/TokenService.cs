@@ -14,23 +14,12 @@ using System.Text;
 
 namespace eCommerce.Application.Implementation
 {
-    public class TokenService : ITokenService
+    public class TokenService(
+        IUserRepository userRepository,
+        IPasswordHasher passwordHasher,
+        IConfiguration configuration)
+        : ITokenService
     {
-        private readonly IUserRepository userRepository;
-        private readonly IPasswordHasher passwordHasher;
-        private readonly IConfiguration configuration;
-
-        public TokenService(
-            IUserRepository userRepository,
-            IPasswordHasher passwordHasher,
-            IConfiguration configuration)
-        {
-            this.userRepository = userRepository;
-            this.passwordHasher = passwordHasher;
-            this.configuration = configuration;
-        }
-
-
         public async Task<TokenResponseDto> GetTokenAsync(
             ValidateUserDto validateUserDto)
         {
@@ -41,15 +30,14 @@ namespace eCommerce.Application.Implementation
             var userDomainObj
                  = await userRepository.GetUserByEmailAsync(validateUserDto.userName);
 
-            if (userDomainObj == null && userDomainObj.Email == null)
-                throw new InvalidUserException("Invalid User");
+            if (userDomainObj == null)
+                throw new InvalidUserException("Invalid Credentials");
 
 
             bool isPasswordValid = passwordHasher.Verify(validateUserDto.password, userDomainObj.Password);
 
             if (!isPasswordValid)
-                throw new InvalidPasswordException("Invalid Password");
-
+                throw new InvalidPasswordException("Invalid Credentials");
 
             return new TokenResponseDto(GenerateAccessToken(userDomainObj), "");
         }

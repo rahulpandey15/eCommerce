@@ -12,7 +12,11 @@ namespace eCommerce.Domain.Contracts
 
         Task<CategoryDomain> GetCategoryByIdAsync(int id);
 
-        Task<bool> AddCategoryAsync(CategoryDomain request);
+        Task<int> AddCategoryAsync(CategoryDomain request);
+
+        Task<bool> HasProductsAsync(int categoryId);
+
+        Task<bool> DeleteCategoryAsync(int categoryId);
 
 
     }

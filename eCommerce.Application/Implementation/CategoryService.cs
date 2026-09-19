@@ -15,29 +15,56 @@ namespace eCommerce.Application.Implementation
             this.categoryRepository = categoryRepository;
         }
 
-        public async Task<bool> AddCategoryAsync(CreateCategoryDto request)
+        public async Task<int> AddCategoryAsync(CreateCategoryDto request)
         {
 
             //DTO-- domain
             var categoryDomain
                  = request.ToCategoryDomain();
 
-
             return await categoryRepository.AddCategoryAsync(
                 categoryDomain);
         }
 
-        public Task<IEnumerable<CategoryResponseDto>> GetCategoriesAsync()
+        public async Task<IEnumerable<CategoryResponseDto>> GetCategoriesAsync()
         {
+            var domains = await categoryRepository.GetCategoriesAsync();
 
-            //DTO-- domain
-            throw new NotImplementedException();
+            return domains.Select(d => new CategoryResponseDto()
+            {
+                Id = d.Id,
+                Name = d.Name,
+                Description = d.Description
+            });
         }
 
-        public Task<CategoryResponseDto> GetCategoryByIdAsync(int categoryId)
+        public async Task<CategoryResponseDto> GetCategoryByIdAsync(int categoryId)
         {
-            //DTO-- domain
-            throw new NotImplementedException();
+            var domain = await categoryRepository.GetCategoryByIdAsync(categoryId);
+
+            if (domain is null)
+                return null;
+
+            return new CategoryResponseDto()
+            {
+                Id = domain.Id,
+                Name = domain.Name,
+                Description = domain.Description
+            };
+        }
+
+        public async Task<(bool Success, bool HasProducts, bool Exists)> DeleteCategoryAsync(int categoryId)
+        {
+            var exists = await categoryRepository.GetCategoryByIdAsync(categoryId) != null;
+            if (!exists)
+                return (false, false, false);
+
+            var hasProducts = await categoryRepository.HasProductsAsync(categoryId);
+            if (hasProducts)
+                return (false, true, true);
+
+            var deleted = await categoryRepository.DeleteCategoryAsync(categoryId);
+            return (deleted, false, true);
         }
     }
 }

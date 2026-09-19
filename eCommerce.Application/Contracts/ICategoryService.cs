@@ -5,8 +5,9 @@ namespace eCommerce.Application.Contracts
 {
     public interface ICategoryService
     {
-        Task<bool> AddCategoryAsync(CreateCategoryDto request);
+        Task<int> AddCategoryAsync(CreateCategoryDto request);
         Task<IEnumerable<CategoryResponseDto>> GetCategoriesAsync();
         Task<CategoryResponseDto> GetCategoryByIdAsync(int categoryId);
+        Task<(bool Success, bool HasProducts, bool Exists)> DeleteCategoryAsync(int categoryId);
     }
 }
