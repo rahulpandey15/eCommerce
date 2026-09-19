@@ -9,6 +9,15 @@ namespace eCommerce.UI
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+
+            builder.Services.AddHttpClient("eCommerceApi", client =>
+            {
+                string baseAddress
+                 = builder.Configuration.GetSection("eCommerceAPI:BaseAddress").Value!;
+
+                client.BaseAddress = new Uri(baseAddress);
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
