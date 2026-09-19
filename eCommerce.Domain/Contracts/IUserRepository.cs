@@ -8,7 +8,6 @@ namespace eCommerce.Domain.Contracts
         Task<bool> IsDuplicateUserAsync(string emailAddress);
         Task<UserDomain> GetUserByEmailAsync(string emailAddress);
 
-        // Write a logic to register to user
-        // write a logic to validate user 
+        Task<UserDomain> GetUserByIdAsync(int userId);
     }
 }

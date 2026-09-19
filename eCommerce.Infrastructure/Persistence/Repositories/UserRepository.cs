@@ -3,6 +3,7 @@ using eCommerce.Domain.DomainObjects;
 using eCommerce.Infrastructure.Persistence.Entities;
 using eCommerce.Infrastructure.Persistence.Mappers;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
 
 
 namespace eCommerce.Infrastructure.Persistence.Repositories
@@ -29,6 +30,25 @@ namespace eCommerce.Infrastructure.Persistence.Repositories
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     Password = user.Password,
+                    UserId = user.Id
+                };
+
+            return new UserDomain();
+        }
+
+        public async Task<UserDomain> GetUserByIdAsync(int userId)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(
+                      x => x.Id == userId);
+
+            if (user is not null)
+                return new UserDomain()
+                {
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Password = user.Password,
+                    UserId = user.Id
                 };
 
             return new UserDomain();
