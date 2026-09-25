@@ -7,5 +7,7 @@ namespace eCommerce.Domain.Contracts
         Task<int> AddAsync(RefreshTokenDomain refreshTokenDomain);
 
         Task<RefreshTokenDomain> GetRefreshTokenAsync(string refreshToken);
+
+        Task<bool> RevokeRefreshTokenAsync(string refreshToken);
     }
 }

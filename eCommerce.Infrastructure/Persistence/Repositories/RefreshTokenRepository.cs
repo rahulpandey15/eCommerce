@@ -24,7 +24,7 @@ namespace eCommerce.Infrastructure.Persistence.Repositories
 
             _dbContext.RefreshTokens.Add(refreshToken);
 
-           return _dbContext.SaveChangesAsync();
+            return _dbContext.SaveChangesAsync();
         }
 
         public async Task<RefreshTokenDomain> GetRefreshTokenAsync(
@@ -37,6 +37,20 @@ namespace eCommerce.Infrastructure.Persistence.Repositories
                 return null;
 
             return tokenDetail.ToRefreshTokenDomain();
+        }
+
+        public async Task<bool> RevokeRefreshTokenAsync(string refreshToken)
+        {
+            var tokenDetail
+                = await _dbContext.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshToken);
+
+            tokenDetail.RevokeAt = DateTime.UtcNow;
+            tokenDetail.ModifiedBy = "system";
+            tokenDetail.ModifiedOn = DateTime.UtcNow;
+
+            int rowsModified = await _dbContext.SaveChangesAsync();
+
+            return rowsModified > 0;
         }
     }
 }

@@ -36,5 +36,15 @@ namespace eCommerce.API.Controllers
             return Ok(tokenDetails);
         }
 
+        [HttpPost("revoke")]
+        public async Task<IActionResult> Revoke(
+           RevokeTokenDto revokeToken)
+        {
+            var tokenDetails
+                 = await tokenService.RevokeTokenAsync(revokeToken);
+
+            return Ok(tokenDetails);
+        }
+
     }
 }

@@ -18,7 +18,8 @@ namespace eCommerce.Application.Implementation
         IUserRepository userRepository,
         IPasswordHasher passwordHasher,
         IConfiguration configuration,
-        IRefreshTokenRepository refreshTokenRepository)
+        IRefreshTokenRepository refreshTokenRepository,
+        ITokenRevocationService tokenRevocationService)
         : ITokenService
     {
         public async Task<TokenResponseDto> GetTokenAsync(
@@ -43,7 +44,7 @@ namespace eCommerce.Application.Implementation
             string refreshToken
                  = await GenerateAndStoreRefreshToken(userDomainObj);
 
-            return new TokenResponseDto(GenerateAccessToken(userDomainObj), refreshToken);// give to refresh token
+            return new TokenResponseDto(GenerateAccessToken(userDomainObj, refreshToken), refreshToken);// give to refresh token
         }
 
         public async Task<TokenResponseDto> RefreshTokenAsync(
@@ -58,13 +59,13 @@ namespace eCommerce.Application.Implementation
             var storedToken
                   = await refreshTokenRepository.GetRefreshTokenAsync(refreshTokenDto.refreshToken);
 
-            if(storedToken == null)
+            if (storedToken == null)
                 throw new InvalidTokenException("Invalid Refresh Token");
 
             if (storedToken.IsExpired())
                 throw new InvalidTokenException("Refresh Token Expired");
 
-            if(storedToken.IsRevoked())
+            if (storedToken.IsRevoked())
                 throw new InvalidTokenException("Refresh Token Revoked"); // TODO : write a logic to revoke all token
 
             var userDomain = await userRepository.GetUserByIdAsync(storedToken.UserId);
@@ -72,11 +73,40 @@ namespace eCommerce.Application.Implementation
             string refreshToken
                = await GenerateAndStoreRefreshToken(userDomain);
 
-            return new TokenResponseDto(GenerateAccessToken(userDomain), refreshToken);
+            return new TokenResponseDto(GenerateAccessToken(userDomain, refreshToken), refreshToken);
+        }
+
+        public async Task<bool> RevokeTokenAsync(RevokeTokenDto revokeTokenDto)
+        {
+            //1. If request contains a token
+
+            if (string.IsNullOrWhiteSpace(revokeTokenDto.refreshToken))
+                throw new InvalidTokenException("Refresh Token Missing");  // TODO : Result Pattern 
+
+
+            var storedToken
+                = await refreshTokenRepository.GetRefreshTokenAsync(revokeTokenDto.refreshToken);
+
+            if (storedToken == null)
+                throw new InvalidTokenException("Invalid Refresh Token");
+
+
+            if (storedToken.IsRevoked())
+                throw new InvalidTokenException("Token is already revoked");
+
+            bool isTokenRevoked =
+                await refreshTokenRepository.RevokeRefreshTokenAsync(revokeTokenDto.refreshToken);
+
+            await tokenRevocationService.InvalidateSessionCacheAsync(revokeTokenDto.refreshToken);
+
+            // invalidate that token inside cache as well
+
+            return isTokenRevoked;
         }
 
         private string GenerateAccessToken(
-            UserDomain userDomain)
+            UserDomain userDomain,
+            string sessionId)
         {
             var secretKey = configuration["Jwt:Secret"];
 
@@ -89,9 +119,10 @@ namespace eCommerce.Application.Implementation
             var tokenDescriptor
                  = new SecurityTokenDescriptor
                  {
-                     Subject = new System.Security.Claims.ClaimsIdentity([
+                     Subject = new ClaimsIdentity([
                             new Claim(ClaimTypes.Name,userDomain.FirstName + " " + userDomain.LastName),
-                            new Claim(ClaimTypes.Email,userDomain.Email)
+                            new Claim(ClaimTypes.Email,userDomain.Email),
+                            new Claim(ClaimTypes.Sid,sessionId)
                          ]),
                      Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["Jwt:TokenExpiryInMinutes"])),
                      SigningCredentials = signingCredentials,
