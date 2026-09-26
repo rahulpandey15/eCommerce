@@ -12,5 +12,7 @@ namespace eCommerce.Application.Contracts
         Task<TokenResponseDto> RefreshTokenAsync(
           RefreshTokenDto validateUserDto);
 
+        Task<bool> RevokeTokenAsync(
+          RevokeTokenDto validateUserDto);
     }
 }
