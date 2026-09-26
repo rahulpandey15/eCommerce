@@ -1,3 +1,4 @@
+using eCommerce.API.Middlewares;
 using eCommerce.Application;
 using eCommerce.Application.Contracts;
 using eCommerce.Infrastructure;
@@ -19,6 +20,7 @@ namespace eCommerce.API
 
             builder.Services.AddControllers();
 
+            builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddStackExchangeRedisCache(options =>
             {
@@ -37,8 +39,10 @@ namespace eCommerce.API
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         ValidateAudience = true,
                         ValidateIssuer = true,
-                        ClockSkew = TimeSpan.Zero
+                        ClockSkew = TimeSpan.Zero,
                     };
+
+                    options.SaveToken = true;
 
                     options.Events = new JwtBearerEvents
                     {
@@ -84,8 +88,10 @@ namespace eCommerce.API
 
             app.UseHttpsRedirection();
 
+            app.UseMiddleware<CommonResponseMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseMiddleware<UserContextMiddleware>();
             app.MapControllers();
 
             app.Run();

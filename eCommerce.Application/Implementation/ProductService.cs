@@ -10,11 +10,16 @@ namespace eCommerce.Application.Implementation
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ICurrentUserService _currentUserService;
 
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public ProductService(
+            IProductRepository productRepository, 
+            ICategoryRepository categoryRepository,
+            ICurrentUserService currentUserService)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            this._currentUserService = currentUserService;
         }
 
         public async Task<int> CreateProductAsync(CreateProductDto dto)
@@ -35,6 +40,7 @@ namespace eCommerce.Application.Implementation
                 throw new InvalidOperationException("A product with the same name already exists.");
 
             var domain = dto.ToProductDomain();
+            domain.CreatedBy = _currentUserService.GetCurrentUser();
 
             return await _productRepository.AddProductAsync(domain);
         }
@@ -97,6 +103,7 @@ namespace eCommerce.Application.Implementation
                 throw new InvalidOperationException("A product with the same name already exists.");
 
             var domain = dto.ToProductDomain();
+            domain.CreatedBy = _currentUserService.GetCurrentUser();
             return await _productRepository.UpdateProductAsync(domain);
         }
     }

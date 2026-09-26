@@ -18,7 +18,6 @@ namespace eCommerce.Infrastructure.Persistence.Repositories
         public async Task<int> AddProductAsync(ProductDomain request)
         {
             var product = request.ToProduct();
-            product.CreatedBy = "system";
             product.CreatedOn = DateTime.Now;
             _dbContext.Products.Add(product);
             await _dbContext.SaveChangesAsync();
@@ -71,7 +70,6 @@ namespace eCommerce.Infrastructure.Persistence.Repositories
             existing.StockQuantity = request.StockQuantity;
             existing.CategoryId = request.CategoryId;
             existing.IsActive = request.IsActive;
-            existing.ModifiedBy = "system";
             existing.ModifiedOn = DateTime.Now;
 
             _dbContext.Products.Update(existing);
