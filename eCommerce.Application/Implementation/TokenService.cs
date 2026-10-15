@@ -122,7 +122,8 @@ namespace eCommerce.Application.Implementation
                      Subject = new ClaimsIdentity([
                             new Claim(ClaimTypes.Name,userDomain.FirstName + " " + userDomain.LastName),
                             new Claim(ClaimTypes.Email,userDomain.Email),
-                            new Claim(ClaimTypes.Sid,sessionId)
+                            new Claim(ClaimTypes.Sid,sessionId),
+                            new Claim(ClaimTypes.Role,"Admin")  // role must come from database
                          ]),
                      Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["Jwt:TokenExpiryInMinutes"])),
                      SigningCredentials = signingCredentials,
