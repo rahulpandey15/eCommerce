@@ -1,7 +1,9 @@
 using eCommerce.API.Middlewares;
 using eCommerce.Application;
 using eCommerce.Application.Contracts;
+using eCommerce.Application.Jobs;
 using eCommerce.Infrastructure;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -91,8 +93,26 @@ namespace eCommerce.API
             app.UseMiddleware<CommonResponseMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseHangfireDashboard("/hangfire"); // This will load hangfire dashboard
+
             app.UseMiddleware<UserContextMiddleware>();
             app.MapControllers();
+
+
+            using (var scope = app.Services.CreateScope()) 
+            {
+                var jobs = scope.ServiceProvider.GetRequiredService<IBackgroundJobService>();
+
+                jobs.Enqueue<EnqueuedJob>(
+                   j => j.EnqueueJob());
+
+                jobs.AddOrUpdateRecurring<OrderProcessingJob>(
+                    "order-processing", 
+                    j => j.SendOrderConfirmationAsync(),
+                    Cron.Minutely());
+            }
+
 
             app.Run();
         }

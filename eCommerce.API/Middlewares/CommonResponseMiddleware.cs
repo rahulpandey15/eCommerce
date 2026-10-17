@@ -32,12 +32,12 @@ namespace eCommerce.API.Middlewares
                 throw;
             }
 
-            if(context.Response.ContentType is not null 
+            if (context.Response.ContentType is not null
                 && context.Response.ContentType.Contains("application/json"))
             {
                 memoryStream.Seek(0, SeekOrigin.Begin);
 
-                var responseBody = 
+                var responseBody =
                     await new StreamReader(memoryStream).ReadToEndAsync(); // line of code will have real response from controller
 
 
@@ -55,7 +55,14 @@ namespace eCommerce.API.Middlewares
                 context.Response.Body = originalBody;
 
                 await context.Response.WriteAsync(jsonResponse);
-
+            }
+            else
+            {
+                // For non-JSON responses (e.g. HTML from Hangfire dashboard), copy the buffered
+                // response back to the original response stream so the client receives it.
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                await memoryStream.CopyToAsync(originalBody);
+                context.Response.Body = originalBody;
             }
         }
     }
