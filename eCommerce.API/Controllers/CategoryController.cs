@@ -1,12 +1,16 @@
 ﻿using eCommerce.Application.Contracts;
 using eCommerce.Application.DTO.Request;
+using eCommerce.Infrastructure.Persistence.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace eCommerce.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController(ICategoryService categoryService) : ControllerBase
+    public class CategoryController(
+        ICategoryService categoryService,
+        AppDbContext appDbContext) : ControllerBase
     {
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -49,5 +53,47 @@ namespace eCommerce.API.Controllers
         }
 
 
+        [HttpGet("product-count-by-categories")]
+        public async Task<IActionResult> CategoriesWithProductCount()
+        {
+            var data = await appDbContext.Categories
+                .Select(x => new
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ProductCount = x.Products.Count,
+                    ActiveProducts = x.Products.Count(s => s.IsActive),
+                    InactiveProduct = x.Products.Count(s => !s.IsActive)
+                }).ToListAsync();
+
+            return Ok(data);
+        }
+
+        [HttpGet("top-categories-by-revenue")]
+        public async Task<IActionResult> TopCategoriesByRevenue()
+        {
+            // Order Item,. product, Category
+
+            var data = await appDbContext.OrderItems
+                       .Include(oi => oi.Product)
+                       .Where(oi => oi.Product != null)
+                       .GroupBy(oi => new
+                       {
+                           CategoryId = 
+                                oi.Product.CategoryId,
+                           CategoryName = 
+                            oi.Product.Category != null ? oi.Product.Category.Name : null
+                       })
+                       .Select(f => new
+                       {
+                           CategoryId = f.Key.CategoryId,
+                           CategoryName = f.Key.CategoryName,
+                           Revenue = f.Sum(x => x.TotalPrice),
+                           UnitSold = f.Sum(x => x.Quantity)
+                       })
+                       .OrderByDescending(x => x.Revenue)
+                       .ToListAsync();
+            return Ok(data);
+        }
     }
 }

@@ -97,7 +97,7 @@ namespace eCommerce.API.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> Search(string searchText="", int page=1, int pazeSize = 10)
+        public async Task<IActionResult> Search(string searchText="", int page=1, int pageSize = 10)
         {
             var query = dbContext.Products.AsQueryable(); // 
 
@@ -113,7 +113,7 @@ namespace eCommerce.API.Controllers
 
             var items
                  = await query.OrderBy(x => x.Name)
-                 .Skip((page - 1) * pazeSize)
+                 .Skip((page - 1) * pageSize)
                  .Take(page)
                  .Select(x => new
                  {
