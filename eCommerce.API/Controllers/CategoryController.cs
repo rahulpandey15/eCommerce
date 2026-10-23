@@ -10,11 +10,14 @@ namespace eCommerce.API.Controllers
     [ApiController]
     public class CategoryController(
         ICategoryService categoryService,
-        AppDbContext appDbContext) : ControllerBase
+        AppDbContext appDbContext,
+        ILogger<CategoryController> _logger) : ControllerBase
     {
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+            _logger.LogInformation("Processing GET endpoint in Category Controller");
+
             var categories = await categoryService.GetCategoriesAsync();
             return Ok(categories);
         }

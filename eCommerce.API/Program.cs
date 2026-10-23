@@ -6,6 +6,7 @@ using eCommerce.Infrastructure;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Security.Claims;
 using System.Text;
 
@@ -16,9 +17,30 @@ namespace eCommerce.API
     {
         public static void Main(string[] args)
         {
+
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            Log.Logger = new LoggerConfiguration()
+               .MinimumLevel.Debug()
+               .WriteTo.Console()
+               .WriteTo.Seq("http://localhost:5341")
+               .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day)
+               .CreateLogger();
+
+            builder.Services.AddLogging(cofig =>
+            {
+                cofig.AddSeq("http://localhost:5341");
+            });
+
+
+            builder.Host.UseSerilog((context, services, configuration) =>
+            {
+                configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(services)
+                    .Enrich.FromLogContext();
+            });
+
 
             builder.Services.AddControllers();
 
@@ -89,6 +111,9 @@ namespace eCommerce.API
             }
 
             app.UseHttpsRedirection();
+
+
+            app.UseSerilogRequestLogging();
 
             app.UseMiddleware<CommonResponseMiddleware>();
             app.UseAuthentication();

@@ -6,10 +6,14 @@ namespace eCommerce.API.Middlewares
     public class CommonResponseMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<CommonResponseMiddleware> _logger;
 
-        public CommonResponseMiddleware(RequestDelegate next)
+        public CommonResponseMiddleware(
+            RequestDelegate next,
+            ILogger<CommonResponseMiddleware> logger)
         {
             _next = next;
+            this._logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -28,7 +32,7 @@ namespace eCommerce.API.Middlewares
             }
             catch (Exception ex)
             {
-
+                _logger.LogError($"Error Occured {ex.Message}");
                 throw;
             }
 
