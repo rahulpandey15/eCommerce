@@ -6,7 +6,7 @@ namespace eCommerce.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles ="User")] // will be only accessible to admin only 
     public class OrderController : ControllerBase
     {
 

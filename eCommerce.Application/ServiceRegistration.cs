@@ -20,6 +20,8 @@ namespace eCommerce.Application
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ITokenRevocationService, TokenRevocationService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 
             return services;
         }

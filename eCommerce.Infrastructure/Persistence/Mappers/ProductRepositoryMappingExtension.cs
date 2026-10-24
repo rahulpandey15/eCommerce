@@ -15,7 +15,8 @@ namespace eCommerce.Infrastructure.Persistence.Mappers
                 Price = domain.Price,
                 StockQuantity = domain.StockQuantity,
                 CategoryId = domain.CategoryId,
-                IsActive = domain.IsActive
+                IsActive = domain.IsActive,
+                CreatedBy = domain.CreatedBy,
             };
         }
 
@@ -29,7 +30,8 @@ namespace eCommerce.Infrastructure.Persistence.Mappers
                 Price = entity.Price,
                 StockQuantity = entity.StockQuantity,
                 CategoryId = entity.CategoryId,
-                IsActive = entity.IsActive
+                IsActive = entity.IsActive,
+                CreatedBy = entity.CreatedBy
             };
         }
 
