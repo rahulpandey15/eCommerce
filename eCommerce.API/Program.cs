@@ -20,19 +20,6 @@ namespace eCommerce.API
 
             var builder = WebApplication.CreateBuilder(args);
 
-            Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.Debug()
-               .WriteTo.Console()
-               .WriteTo.Seq("http://localhost:5341")
-               .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day)
-               .CreateLogger();
-
-            builder.Services.AddLogging(cofig =>
-            {
-                cofig.AddSeq("http://localhost:5341");
-            });
-
-
             builder.Host.UseSerilog((context, services, configuration) =>
             {
                 configuration
