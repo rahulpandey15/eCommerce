@@ -28,7 +28,6 @@ namespace eCommerce.API
                     .Enrich.FromLogContext();
             });
 
-
             builder.Services.AddControllers();
 
             builder.Services.AddHttpContextAccessor();
