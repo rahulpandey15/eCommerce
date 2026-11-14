@@ -30,6 +30,8 @@ namespace eCommerce.Infrastructure
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+
 
 
             services.AddHangfireInfrastructure(connectionString);

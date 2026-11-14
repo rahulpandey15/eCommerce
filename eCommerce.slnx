@@ -10,6 +10,9 @@
   <Folder Name="/src/BE/Infrastructure/">
     <Project Path="eCommerce.Infrastructure/eCommerce.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/BE/Messaging/">
+    <Project Path="eCommerce.Messaging.Worker/eCommerce.Messaging.Worker.csproj" Id="b339119a-2daa-40e0-ab17-320ddc31dd23" />
+  </Folder>
   <Folder Name="/src/BE/Presentation/">
     <Project Path="eCommerce.API/eCommerce.API.csproj" />
   </Folder>

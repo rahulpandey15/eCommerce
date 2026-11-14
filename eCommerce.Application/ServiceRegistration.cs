@@ -22,7 +22,6 @@ namespace eCommerce.Application
             services.AddScoped<ITokenRevocationService, TokenRevocationService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-
             return services;
         }
 

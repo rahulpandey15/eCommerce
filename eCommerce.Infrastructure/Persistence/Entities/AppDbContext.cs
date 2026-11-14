@@ -36,6 +36,11 @@ namespace eCommerce.Infrastructure.Persistence.Entities
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
 
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
+        public DbSet<ProcessedIntegrationEvent> ProcessedIntegrationEvents { get; set; }
+
+        public DbSet<OrderAuditEntry> OrderAuditEntries { get; set; }
+
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     }

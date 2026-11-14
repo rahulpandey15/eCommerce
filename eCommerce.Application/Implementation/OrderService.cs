@@ -1,23 +1,24 @@
 ﻿using eCommerce.Application.Contracts;
 using eCommerce.Application.DTO.Request;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using eCommerce.Application.Mappers;
+using eCommerce.Domain.Contracts;
+
 
 namespace eCommerce.Application.Implementation
 {
-    public class OrderService : IOrderService
+    public class OrderService(IOrderRepository orderRepository) : IOrderService
     {
-        // TODO : Add a new Order Table
-        // Add a new Order Repository
-        // Write a logic to insert data inside Order Table
-
-
-        public Task<bool> CreateOrderAsync(CreateOrderDto orderDto)
+        public async Task<OrderCreationResultDto> CreateOrderAsync(
+            CreateOrderDto orderDto, 
+            string? correlationId, 
+            CancellationToken cancellationToken = default)
         {
+            var domain = orderDto.ToCreateOrderDomain();
 
+            var response = await orderRepository.CreateAsync(domain, "", correlationId, cancellationToken);
 
-            throw new NotImplementedException();
+            return new OrderCreationResultDto(response.OrderId, response.OrderNumber);
+
         }
     }
 }
