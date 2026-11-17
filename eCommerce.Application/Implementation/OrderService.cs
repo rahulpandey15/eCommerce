@@ -15,10 +15,10 @@ namespace eCommerce.Application.Implementation
         {
             var domain = orderDto.ToCreateOrderDomain();
 
-            var response = await orderRepository.CreateAsync(domain, "", correlationId, cancellationToken);
+            var response = 
+                await orderRepository.CreateAsync(domain, correlationId, cancellationToken);
 
             return new OrderCreationResultDto(response.OrderId, response.OrderNumber);
-
         }
     }
 }

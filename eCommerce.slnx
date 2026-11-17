@@ -4,14 +4,14 @@
   <Folder Name="/src/BE/Application/">
     <Project Path="eCommerce.Application/eCommerce.Application.csproj" />
   </Folder>
+  <Folder Name="/src/BE/BackgroundService/" Id="b72c1874-8606-3355-a2f9-992383854720">
+    <Project Path="eCommerce.Messaging.Worker/eCommerce.Messaging.Worker.csproj" Id="b339119a-2daa-40e0-ab17-320ddc31dd23" />
+  </Folder>
   <Folder Name="/src/BE/Domain/">
     <Project Path="eCommerce.Domain/eCommerce.Domain.csproj" />
   </Folder>
   <Folder Name="/src/BE/Infrastructure/">
     <Project Path="eCommerce.Infrastructure/eCommerce.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/src/BE/Messaging/">
-    <Project Path="eCommerce.Messaging.Worker/eCommerce.Messaging.Worker.csproj" Id="b339119a-2daa-40e0-ab17-320ddc31dd23" />
   </Folder>
   <Folder Name="/src/BE/Presentation/">
     <Project Path="eCommerce.API/eCommerce.API.csproj" />

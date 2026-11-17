@@ -1,7 +1,9 @@
-﻿using eCommerce.Application.Contracts;
+﻿using eCommerce.Application.Common.Messaging;
+using eCommerce.Application.Contracts;
 using eCommerce.Application.Jobs;
 using eCommerce.Domain.Contracts;
 using eCommerce.Infrastructure.Background;
+using eCommerce.Infrastructure.Messaging.Outbox;
 using eCommerce.Infrastructure.Persistence.Entities;
 using eCommerce.Infrastructure.Persistence.Repositories;
 using Hangfire;
@@ -31,8 +33,7 @@ namespace eCommerce.Infrastructure
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
-
-
+            services.AddScoped<IOutboxWriter, OutboxWriter>();
 
             services.AddHangfireInfrastructure(connectionString);
 

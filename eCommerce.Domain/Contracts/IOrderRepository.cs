@@ -7,7 +7,6 @@ namespace eCommerce.Domain.Contracts
     {
      Task<OrderCreationResult> CreateAsync(
            CreateOrderDomain orderDto,
-             string orderNumber,
              string? correlationId,
              CancellationToken cancellationToken = default);
     }
