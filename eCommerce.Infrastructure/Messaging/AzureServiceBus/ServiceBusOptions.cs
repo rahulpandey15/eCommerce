@@ -5,6 +5,7 @@ public sealed class ServiceBusOptions
     public bool Enabled { get; set; }
     public string? ConnectionString { get; set; }
     public string? FullyQualifiedNamespace { get; set; }
+    public string QueueName { get; set; } = "order-events";
     public string TopicName { get; set; } = "order-events";
     public int MaxConcurrentCalls { get; set; } = 8;
     public int PrefetchCount { get; set; } = 20;

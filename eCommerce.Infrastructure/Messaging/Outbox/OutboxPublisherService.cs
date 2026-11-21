@@ -18,9 +18,9 @@ public sealed class OutboxPublisherService(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation(
-            "Outbox publisher started. Enabled: {Enabled}, Topic: {TopicName}",
+            "Outbox publisher started. Enabled: {Enabled}, Queue: {QueueName}",
             _serviceBusOptions.Enabled,
-            _serviceBusOptions.TopicName);
+            _serviceBusOptions.QueueName);
 
         while (!stoppingToken.IsCancellationRequested)
         {

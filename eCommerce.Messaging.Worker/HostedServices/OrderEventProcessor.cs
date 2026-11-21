@@ -10,11 +10,11 @@ using System.Text.Json;
 namespace eCommerce.Messaging.Worker.HostedServices
 {
     public sealed class OrderEventProcessor(
-    ServiceBusClientProvider clientProvider,
-    ServiceBusMessageSerializer serializer,
-    IServiceScopeFactory scopeFactory,
-    IOptions<ServiceBusOptions> options,
-    ILogger<OrderEventProcessor> logger) : IHostedService, IAsyncDisposable
+        ServiceBusClientProvider clientProvider,
+        ServiceBusMessageSerializer serializer,
+        IServiceScopeFactory scopeFactory,
+        IOptions<ServiceBusOptions> options,
+        ILogger<OrderEventProcessor> logger) : IHostedService, IAsyncDisposable
     {
         private readonly List<ServiceBusProcessor> _processors = [];
         private readonly ServiceBusOptions _options = options.Value;
@@ -27,33 +27,26 @@ namespace eCommerce.Messaging.Worker.HostedServices
                 return;
             }
 
-            foreach (var subscriptionName in new[]
-            {
-            "email-notification",
-            "inventory-management",
-            "order-audit"
-        })
-            {
-                var processor = clientProvider.GetClient().CreateProcessor(
-                    _options.TopicName,
-                    subscriptionName,
-                    new ServiceBusProcessorOptions
-                    {
-                        AutoCompleteMessages = false,
-                        MaxConcurrentCalls = _options.MaxConcurrentCalls,
-                        PrefetchCount = _options.PrefetchCount,
-                        MaxAutoLockRenewalDuration = _options.MaxAutoLockRenewalDuration
-                    });
+            var processor = clientProvider.GetClient().CreateProcessor(
+                _options.QueueName,
+                new ServiceBusProcessorOptions
+                {
+                    AutoCompleteMessages = false,
+                    MaxConcurrentCalls = _options.MaxConcurrentCalls,
+                    PrefetchCount = _options.PrefetchCount,
+                    MaxAutoLockRenewalDuration = _options.MaxAutoLockRenewalDuration
+                });
 
-                processor.ProcessMessageAsync += args => ProcessMessageAsync(args, subscriptionName);
-                processor.ProcessErrorAsync += args => ProcessErrorAsync(args, subscriptionName);
-                _processors.Add(processor);
-                await processor.StartProcessingAsync(cancellationToken);
-                logger.LogInformation(
-                    "Started Service Bus processor for topic {TopicName}, subscription {SubscriptionName}",
-                    _options.TopicName,
-                    subscriptionName);
-            }
+            processor.ProcessMessageAsync += ProcessMessageAsync;
+            processor.ProcessErrorAsync += ProcessErrorAsync;
+
+            _processors.Add(processor);
+
+            await processor.StartProcessingAsync(cancellationToken);
+            logger.LogInformation(
+                "Started Service Bus processor for queue {QueueName}",
+                _options.QueueName);
+
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
@@ -65,8 +58,8 @@ namespace eCommerce.Messaging.Worker.HostedServices
         }
 
         private async Task ProcessMessageAsync(
-            ProcessMessageEventArgs args,
-            string subscriptionName)
+            ProcessMessageEventArgs args)
+
         {
             var message = args.Message;
             ServiceBusEvent<OrderCreatedPayload> integrationEvent;
@@ -86,45 +79,49 @@ namespace eCommerce.Messaging.Worker.HostedServices
             {
                 logger.LogError(
                     exception,
-                    "Dead-lettering malformed message {MessageId} from subscription {SubscriptionName}",
+                    "Dead-lettering malformed message {MessageId} from queue {QueueName}",
                     message.MessageId,
-                    subscriptionName);
+                    _options.QueueName);
+
                 await args.DeadLetterMessageAsync(message, "MalformedMessage", exception.Message);
                 return;
             }
 
             try
             {
-            
                 using var scope = scopeFactory.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                var action = scope.ServiceProvider
+                var actions = scope.ServiceProvider
                     .GetRequiredService<IEnumerable<IOrderCreatedAction>>()
-                    .Single(item => item.ConsumerName == subscriptionName);
+                    .ToArray();
 
                 await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
+                const string consumerName = "order-event-processor";
                 var alreadyProcessed = await dbContext.ProcessedIntegrationEvents.AnyAsync(
-                    item => item.EventId == integrationEvent.EventId && item.ConsumerName == subscriptionName);
-                
+                    item => item.EventId == integrationEvent.EventId && item.ConsumerName == consumerName);
+
                 if (alreadyProcessed)
                 {
                     await transaction.CommitAsync();
                     await args.CompleteMessageAsync(message);
                     logger.LogInformation(
-                        "Completed duplicate message {MessageId} for EventId {EventId}, SubscriptionName {SubscriptionName}",
+                        "Completed duplicate message {MessageId} for EventId {EventId} from queue {QueueName}",
                         message.MessageId,
                         integrationEvent.EventId,
-                        subscriptionName);
-                   
+                        _options.QueueName);
                     return;
                 }
 
-                await action.HandleAsync(integrationEvent, CancellationToken.None);
+                foreach (var action in actions)
+                {
+                    await action.HandleAsync(integrationEvent, CancellationToken.None);
+                }
+
                 dbContext.ProcessedIntegrationEvents.Add(new ProcessedIntegrationEvent
                 {
                     EventId = integrationEvent.EventId,
-                    ConsumerName = subscriptionName,
+                    ConsumerName = consumerName,
                     ProcessedAtUtc = DateTimeOffset.UtcNow
                 });
                 await dbContext.SaveChangesAsync();
@@ -132,44 +129,42 @@ namespace eCommerce.Messaging.Worker.HostedServices
                 await args.CompleteMessageAsync(message);
 
                 logger.LogInformation(
-                    "Processed message {MessageId} for EventId {EventId}, OrderId {OrderId}, DeliveryCount {DeliveryCount}, SubscriptionName {SubscriptionName}",
+                    "Processed message {MessageId} for EventId {EventId}, OrderId {OrderId}, DeliveryCount {DeliveryCount}, Queue {QueueName}",
                     message.MessageId,
                     integrationEvent.EventId,
                     integrationEvent.Payload.OrderId,
                     message.DeliveryCount,
-                    subscriptionName);
+                    _options.QueueName);
             }
             catch (ServiceBusException exception) when (exception.Reason == ServiceBusFailureReason.MessageLockLost)
             {
                 logger.LogWarning(
                     exception,
-                    "Message lock expired for MessageId {MessageId}, EventId {EventId}, SubscriptionName {SubscriptionName}",
+                    "Message lock expired for MessageId {MessageId}, EventId {EventId}, Queue {QueueName}",
                     message.MessageId,
                     integrationEvent.EventId,
-                    subscriptionName);
+                    _options.QueueName);
             }
             catch (Exception exception)
             {
-          
                 logger.LogError(
                     exception,
-                    "Transient processing failure for MessageId {MessageId}, EventId {EventId}, OrderId {OrderId}, DeliveryCount {DeliveryCount}, SubscriptionName {SubscriptionName}",
+                    "Transient processing failure for MessageId {MessageId}, EventId {EventId}, OrderId {OrderId}, DeliveryCount {DeliveryCount}, Queue {QueueName}",
                     message.MessageId,
                     integrationEvent.EventId,
                     integrationEvent.Payload.OrderId,
                     message.DeliveryCount,
-                    subscriptionName);
+                    _options.QueueName);
                 await args.AbandonMessageAsync(message);
             }
         }
 
-        private Task ProcessErrorAsync(ProcessErrorEventArgs args, string subscriptionName)
+        private Task ProcessErrorAsync(ProcessErrorEventArgs args)
         {
             logger.LogError(
                 args.Exception,
-                "Service Bus processor error for Entity {EntityPath}, SubscriptionName {SubscriptionName}, ErrorSource {ErrorSource}",
+                "Service Bus processor error for Entity {EntityPath}, ErrorSource {ErrorSource}",
                 args.EntityPath,
-                subscriptionName,
                 args.ErrorSource);
             return Task.CompletedTask;
         }

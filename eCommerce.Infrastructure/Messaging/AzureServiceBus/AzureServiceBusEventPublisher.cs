@@ -67,17 +67,18 @@ public sealed class AzureServiceBusEventPublisher(
             cancellationToken);
 
         logger.LogInformation(
-            "Published integration event {EventType} with EventId {EventId} and CorrelationId {CorrelationId} to topic {TopicName}",
+            "Published integration event {EventType} with EventId {EventId} and CorrelationId {CorrelationId} to queue {QueueName}",
             eventType,
             eventId,
             correlationId,
-            _options.TopicName);
+            _options.QueueName);
+
         
     }
 
     private ValueTask<ServiceBusSender> GetSenderAsync(CancellationToken cancellationToken)
     {
-        _sender ??= clientProvider.GetClient().CreateSender(_options.TopicName);
+        _sender ??= clientProvider.GetClient().CreateSender(_options.QueueName);
         return ValueTask.FromResult(_sender);
     }
 

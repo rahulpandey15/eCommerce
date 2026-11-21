@@ -20,7 +20,8 @@ namespace eCommerce.Infrastructure
 
         public static IServiceCollection AddInfrastructure(
             this IServiceCollection services,
-            string connectionString)
+            string connectionString,
+            bool addHangfire = true)
         {
             services.AddDbContext<AppDbContext>(options =>
             {
@@ -35,7 +36,10 @@ namespace eCommerce.Infrastructure
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IOutboxWriter, OutboxWriter>();
 
-            services.AddHangfireInfrastructure(connectionString);
+            if (addHangfire)
+            {
+                services.AddHangfireInfrastructure(connectionString);
+            }
 
             return services;
         }
